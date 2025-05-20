@@ -8,7 +8,7 @@ import { getApiKeyConfig } from '../../config';
 // Controller to handle OTP request
 export const requestOTP = async (req: Request, res: Response) => {
   try {
-    const { destination, channel, sender_id } = req.body;
+    const { destination, channel, sender_id, otp_length, ttl } = req.body;
     const apiKey = req.headers['x-api-key'] as string;
     const config = getApiKeyConfig(apiKey);
 
@@ -25,8 +25,9 @@ export const requestOTP = async (req: Request, res: Response) => {
       : destination;
 
     // Generate new OTP
-    const otp = generateOTP();
-    const expiresAt = Date.now() + (config.ttl * 1000);
+    const otp = generateOTP(otp_length);
+    const chosenTTL = (typeof ttl === 'number' && ttl > 0) ? ttl : config.ttl;
+    const expiresAt = Date.now() + (chosenTTL * 1000);
 
     // Store OTP
     otpStore.set(formattedDestination, {
@@ -38,9 +39,10 @@ export const requestOTP = async (req: Request, res: Response) => {
     });
 
     // Send OTP
+    const expiryMinutes = Math.ceil(chosenTTL / 60);
     const sent = channel === 'sms'
-      ? await smsSender.sendOTP(formattedDestination, otp, sender_id)
-      : await emailSender.sendOTP(formattedDestination, otp, sender_id);
+      ? await smsSender.sendOTP(formattedDestination, otp, sender_id, expiryMinutes)
+      : await emailSender.sendOTP(formattedDestination, otp, sender_id, expiryMinutes);
 
     if (!sent) {
       otpStore.delete(formattedDestination);
@@ -52,7 +54,8 @@ export const requestOTP = async (req: Request, res: Response) => {
 
     res.json({
       success: true,
-      message: 'OTP sent successfully'
+      message: 'OTP sent successfully',
+      expires_in: chosenTTL
     });
   } catch (error) {
     console.error('OTP request failed:', error);
@@ -93,7 +96,7 @@ export const verifyOTP = async (req: Request, res: Response) => {
       });
     }
 
-    if (record.otp !== otp) {
+    if (record.otp.slice(4) !== otp) {
       return res.status(400).json({
         success: false,
         message: 'Invalid OTP'
@@ -138,9 +141,10 @@ export const resendOTP = async (req: Request, res: Response) => {
     }
 
     // Resend the same OTP
+    const expiryMinutes = Math.ceil((record.expiresAt - Date.now()) / 60000);
     const sent = channel === 'sms'
-      ? await smsSender.sendOTP(destination, record.otp, sender_id)
-      : await emailSender.sendOTP(destination, record.otp, sender_id);
+      ? await smsSender.sendOTP(destination, record.otp, sender_id, expiryMinutes)
+      : await emailSender.sendOTP(destination, record.otp, sender_id, expiryMinutes);
 
     if (!sent) {
       return res.status(500).json({

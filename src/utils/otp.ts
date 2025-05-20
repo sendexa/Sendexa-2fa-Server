@@ -1,14 +1,23 @@
 import { config } from '../config';
 
-export const generateOTP = (): string => {
+function generatePrefix(length: number = 4): string {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  let prefix = '';
+  for (let i = 0; i < length; i++) {
+    prefix += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return prefix;
+}
+
+export const generateOTP = (length?: number): string => {
   const digits = '0123456789';
   let otp = '';
-  
-  for (let i = 0; i < config.otpLength; i++) {
+  const otpLength = length || config.otpLength;
+  for (let i = 0; i < otpLength; i++) {
     otp += digits[Math.floor(Math.random() * 10)];
   }
-  
-  return otp;
+  const prefix = generatePrefix(4);
+  return prefix + otp;
 };
 
 export const formatPhoneNumber = (phone: string): string => {

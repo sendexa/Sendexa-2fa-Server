@@ -14,34 +14,33 @@ export class EmailSender {
   private transporter: nodemailer.Transporter;
 
   constructor() {
-    // For testing, create a mock transporter
-    this.transporter = {
-      sendMail: async (mailOptions: any) => {
-        console.log('TEST MODE - Email OTP:', {
-          to: mailOptions.to,
-          from: mailOptions.from,
-          subject: mailOptions.subject,
-          html: mailOptions.html
-        });
-        return { messageId: 'test-message-id' };
-      }
-    } as any;
+    // Real SMTP transporter using .env variables
+    this.transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: Number(process.env.SMTP_PORT) || 587,
+      secure: false, // true for 465, false for other ports
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
   }
 
-  async sendOTP(destination: string, otp: string, senderId: string): Promise<boolean> {
+  async sendOTP(destination: string, otp: string, senderId: string, expiryMinutes: number): Promise<boolean> {
     try {
+      // Split OTP into prefix and digits
+      const prefix = otp.slice(0, 4);
+      const digits = otp.slice(4);
       const payload: EmailPayload = {
         to: destination,
-        from: senderId,
+        from: senderId || process.env.EMAIL_FROM || '',
         subject: 'Your Verification Code',
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h2>Verification Code</h2>
-            <p>Your verification code is:</p>
-            <div style="background-color: #f4f4f4; padding: 10px; text-align: center; font-size: 24px; letter-spacing: 5px; margin: 20px 0;">
-              <strong>${otp}</strong>
-            </div>
-            <p>This code will expire in 5 minutes.</p>
+            <p>Your verification code is: <strong style="font-size: 22px;">${digits}</strong></p>
+            <p>Please enter it after the prefix <strong style="font-size: 18px; letter-spacing: 2px;">${prefix}</strong>.</p>
+            <p>This code will expire in ${expiryMinutes} minute${expiryMinutes === 1 ? '' : 's'}.</p>
             <p>If you didn't request this code, please ignore this email.</p>
           </div>
         `

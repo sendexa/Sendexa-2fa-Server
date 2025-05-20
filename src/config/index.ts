@@ -14,7 +14,7 @@ const apiKeyRegistry: Record<string, ApiKeyConfig> = {
   'test-api-key': {
     senderIds: {
       sms: ['MyAppVerify', 'Sendexa'],
-      email: ['noreply@myapp.com', 'verify@myapp.com']
+      email: ['noreply@myapp.com', "2fa@sendexa.co", 'verify@myapp.com']
     },
     rateLimit: 1,
     ttl: 300 // 5 minutes

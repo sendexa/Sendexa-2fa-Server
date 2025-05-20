@@ -18,11 +18,14 @@ export class SMSSender {
     this.apiUrl = process.env.SMS_API_URL || '';
   }
 
-  async sendOTP(destination: string, otp: string, senderId: string): Promise<boolean> {
+  async sendOTP(destination: string, otp: string, senderId: string, expiryMinutes: number): Promise<boolean> {
     try {
+      // Split OTP into prefix and digits
+      const prefix = otp.slice(0, 4);
+      const digits = otp.slice(4);
       const payload: SMSPayload = {
         to: destination,
-        message: `Your verification code is: ${otp}. Valid for 5 minutes.`,
+        message: `Your verification code is: ${digits}. Please enter it after the prefix ${prefix}. Valid for ${expiryMinutes} minute${expiryMinutes === 1 ? '' : 's'}.`,
         sender_id: senderId
       };
 
