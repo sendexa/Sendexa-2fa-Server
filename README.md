@@ -1,6 +1,3 @@
-### `context.md`
-
----
 
 ## **Sendexa 2FA Server**
 
@@ -22,20 +19,31 @@ The **Sendexa 2FA Server** (`2fa.sendexa.co`) provides secure and scalable One-T
 
 ```
 sendexa-2fa/
-├── src/
-│   ├── v1/
-│   │   ├── controllers/         # Handles OTP request/verify/resend logic
-│   │   ├── services/            # Core OTP logic and delivery functions
-│   │   ├── routes/              # Express routes for /v1/otp/*
-│   │   └── validators/          # Input validation schemas
-│
-│   ├── middleware/              # API key auth, input validators
-│   ├── utils/                   # OTP generator, phone formatter, rate limiter
-│   ├── config/                  # API key registry, sender configs, TTL settings
-│   ├── store/                   # In-memory OTP cache with expiration
-│   ├── app.ts                   # App-level middleware and bootstrapping
-│   └── server.ts                # Entry point to run Express app
-```
+src/
+├── v1/
+│   ├── controllers/
+│   │   └── otp.controller.ts
+│   ├── routes/
+│   │   └── otp.routes.ts
+├── middleware/
+│   ├── auth.ts
+│   ├── logger.ts
+│   ├── rateLimiter.ts
+│   └── validators.ts
+├── services/
+│   ├── emailSender.ts
+│   └── smsSender.ts
+├── store/
+│   └── otpStore.ts
+├── utils/
+│   └── otp.ts
+├── types/
+│   └── index.ts
+├── config/
+│   └── index.ts
+├── app.ts
+└── server.ts
+
 
 ---
 

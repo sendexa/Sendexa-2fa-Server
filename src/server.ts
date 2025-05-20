@@ -5,8 +5,8 @@ import app from "./app";
 // Load environment variables from .env
 dotenv.config();
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`✅ 2FA server running on http://localhost:${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });
