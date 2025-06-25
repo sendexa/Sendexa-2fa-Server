@@ -21,11 +21,11 @@ export class SMSSender {
   async sendOTP(destination: string, otp: string, senderId: string, expiryMinutes: number): Promise<boolean> {
     try {
       // Split OTP into prefix and digits
-      const prefix = otp.slice(0, 4);
+      // const prefix = otp.slice(0, 4);
       const digits = otp.slice(4);
       const payload: SMSPayload = {
         to: destination,
-        message: `Your verification code is: ${digits}. Please enter it after the prefix ${prefix}. Valid for ${expiryMinutes} minute${expiryMinutes === 1 ? '' : 's'}.`,
+        message: `Your verification code is: ${digits}. Valid for ${expiryMinutes} minute${expiryMinutes === 1 ? '' : 's'}.`,
         sender_id: senderId
       };
 

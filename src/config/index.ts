@@ -13,8 +13,8 @@ interface ApiKeyConfig {
 const apiKeyRegistry: Record<string, ApiKeyConfig> = {
   'test-api-key': {
     senderIds: {
-      sms: ['MyAppVerify', 'Sendexa'],
-      email: ['noreply@myapp.com', "2fa@sendexa.co", 'verify@myapp.com']
+      sms: [ 'Sendexa'],
+      email: ["2fa@sendexa.co"]
     },
     rateLimit: 1,
     ttl: 300 // 5 minutes

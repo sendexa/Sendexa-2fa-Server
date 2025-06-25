@@ -29,7 +29,7 @@ export class EmailSender {
   async sendOTP(destination: string, otp: string, senderId: string, expiryMinutes: number): Promise<boolean> {
     try {
       // Split OTP into prefix and digits
-      const prefix = otp.slice(0, 4);
+      // const prefix = otp.slice(0, 4);
       const digits = otp.slice(4);
       const payload: EmailPayload = {
         to: destination,
@@ -39,7 +39,6 @@ export class EmailSender {
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h2>Verification Code</h2>
             <p>Your verification code is: <strong style="font-size: 22px;">${digits}</strong></p>
-            <p>Please enter it after the prefix <strong style="font-size: 18px; letter-spacing: 2px;">${prefix}</strong>.</p>
             <p>This code will expire in ${expiryMinutes} minute${expiryMinutes === 1 ? '' : 's'}.</p>
             <p>If you didn't request this code, please ignore this email.</p>
           </div>
